@@ -312,9 +312,12 @@ int vtkvmtkPolyDataCenterlines::RequestData(
 
   vtkPoints* endPointPairs = vtkPoints::New();
 
+  const vtkIdType numTargetSeedIds = this->TargetSeedIds->GetNumberOfIds();
+  const vtkIdType numHitTargets = hitTargets->GetNumberOfIds();
+  if(numHitTargets == numTargetSeedIds) {
   if (this->AppendEndPointsToCenterlines)
     {
-    for (i=0; i<this->TargetSeedIds->GetNumberOfIds(); i++)
+    for (i=0; i<numTargetSeedIds; i++)
       {
       if (this->CapCenterIds)
         {
@@ -338,6 +341,7 @@ int vtkvmtkPolyDataCenterlines::RequestData(
     
     this->AppendEndPoints(endPointPairs);
     }
+  }
 
   if (this->CenterlineResampling)
     {
