@@ -366,34 +366,43 @@ void vtkvmtkCenterlineBifurcationReferenceSystems::ComputeGroupReferenceSystem(v
       }    
     }
 
+  double positiveNormal[3], orientedNormal[3];  
+
   int numberOfNormals = bifurcationNormals->GetNumberOfTuples();
+  if(numberOfNormals) {
+	  bifurcationNormals->GetTuple(0,positiveNormal);
 
-  double positiveNormal[3], orientedNormal[3];
-  bifurcationNormals->GetTuple(0,positiveNormal);
+	  for (i=1; i<numberOfNormals; i++)
+	  {
+		  bifurcationNormals->GetTuple(i,orientedNormal);
 
-  for (i=1; i<numberOfNormals; i++)
-    {
-    bifurcationNormals->GetTuple(i,orientedNormal);
+		  if (vtkMath::Dot(positiveNormal,orientedNormal) < 0.0)
+		  {
+			  orientedNormal[0] *= -1.0;
+			  orientedNormal[1] *= -1.0;
+			  orientedNormal[2] *= -1.0;
+			  bifurcationNormals->SetTuple(i,orientedNormal);
+		  }
+	  }
 
-    if (vtkMath::Dot(positiveNormal,orientedNormal) < 0.0)
-      {
-      orientedNormal[0] *= -1.0;
-      orientedNormal[1] *= -1.0;
-      orientedNormal[2] *= -1.0;
-      bifurcationNormals->SetTuple(i,orientedNormal);
-      }
-    }
- 
-  bifurcationNormal[0] = bifurcationNormal[1] = bifurcationNormal[2] = 0.0;
+	  bifurcationNormal[0] = bifurcationNormal[1] = bifurcationNormal[2] = 0.0;
 
-  for (i=0; i<numberOfNormals; i++)
-    {
-    bifurcationNormals->GetTuple(i,orientedNormal);
-    for (int k=0; k<3; k++)
-      {
-      bifurcationNormal[k] += orientedNormal[k];
-      }
-    }
+	  for (i=0; i<numberOfNormals; i++)
+	  {
+		  bifurcationNormals->GetTuple(i,orientedNormal);
+		  for (int k=0; k<3; k++)
+		  {
+			  bifurcationNormal[k] += orientedNormal[k];
+		  }
+	  }
+  }
+  else {
+	  bifurcationNormal[0] = bifurcationNormal[1] = bifurcationNormal[2] = 0.0;
+	  bifurcationNormal[2] = 1.0;
+  }
+
+  
+  
 
   vtkMath::Normalize(bifurcationNormal);
 
